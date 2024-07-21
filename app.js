@@ -1,9 +1,9 @@
 require('colors');
-const inquirer = require('inquirer');
-const { inquirerMenu, pause, readInput } = require('./helpers/inquirer');
+const { inquirerMenu, pause, readInput, confirm } = require('./helpers/inquirer');
 const { saveFile, readDb } = require('./helpers/saveFile');
-const Forecast = require('./models/Forecast');
 
+const Table = require('cli-table3');
+const Forecast = require('./models/Forecast');
 
 const main = async () => {
     let opt = '';
@@ -20,111 +20,85 @@ const main = async () => {
         opt = await inquirerMenu();
         switch (opt) {
             case '1':
-                const teamName = await readInput('Nombre del equipo:');
-                const desiredSuccesses = await readInput('Número de ensayos . <En cuántos partidos deseas hacer tu calculo de predicción>');
-                const nGamesPlayed = await readInput(`Cúantos partidos te gustaría que ganara ${teamName} en ${desiredSuccesses} partido(s) jugado(s)?`);
-                const dataVictoriesMatches = await readInput('Número de victorias del equip < número de últimas victorias que conozcas>');
-                const dataGamesPlayed = await readInput('Número de partidos jugados <en cuántos partidos tuvo las victorias que escribiste ?>:');
+                const teamName1 = await readInput('Nombre del equipo A:');
+                const teamName2 = await readInput('Nombre del equipo B:');
+                const nGamesPlayed = await readInput('Número total de ensayos:');
+                const desiredSuccesses = await readInput('Número de éxitos deseados:');
+                const dataVictoriesMatchesA = await readInput(`Número de victorias del equipo ${teamName1}:`);
+                const dataGamesPlayedA = await readInput(`Número de partidos jugados por el equipo ${teamName1}:`);
+                const dataVictoriesMatchesB = await readInput(`Número de victorias del equipo ${teamName2}:`);
+                const dataGamesPlayedB = await readInput(`Número de partidos jugados por el equipo ${teamName2}:`);
+
+                const pA = proyections.calculateProbabilityOfP(dataVictoriesMatchesA, dataGamesPlayedA);
+                const probabilityA = parseFloat(proyections.binomialProbability(nGamesPlayed, desiredSuccesses, pA));
+
+                const pB = proyections.calculateProbabilityOfP(dataVictoriesMatchesB, dataGamesPlayedB);
                 
-                const p = proyections.calculateProbabilityOfP(dataVictoriesMatches, dataGamesPlayed);
-                const probability = proyections.binomialProbability(nGamesPlayed, desiredSuccesses, p);
-                
-                console.log(`La probabilidad de tener exactamente ${desiredSuccesses} éxitos en ${nGamesPlayed} ensayos es: ${probability.toFixed(2)}%`.green);
+                const probabilityB = parseFloat(proyections.binomialProbability(nGamesPlayed, desiredSuccesses, pB));
+
+                // Historia entre equipos
+                const historyProbabilityA = 0.5; // ejemplo, ajustar según los datos reales
+                const historyProbabilityB = 0.4; // ejemplo, ajustar según los datos reales
+
+                const weightRecent = 0.6;
+                const weightHeadToHead = 0.4;
+
+                const weightedProbA = proyections.weightedProbability(probabilityA / 100, historyProbabilityA, weightRecent, weightHeadToHead);
+                const weightedProbB = proyections.weightedProbability(probabilityB / 100, historyProbabilityB, weightRecent, weightHeadToHead);
+
+                // Probabilidad de empate
+                const drawProbability = (weightedProbA + weightedProbB) / 2;
 
                 proyections.addPrediction({
-                    teamName,
+                    teamName: teamName1,
                     nGamesPlayed,
                     desiredSuccesses,
-                    dataVictoriesMatches,
-                    dataGamesPlayed,
-                    probability: probability.toFixed(2)
+                    dataVictoriesMatches: dataVictoriesMatchesA,
+                    dataGamesPlayed: dataGamesPlayedA,
+                    probability: probabilityA,
+                    historyProbability: historyProbabilityA,
+                    weightedProbability: weightedProbA,
+                    drawProbability
                 });
-
-                saveFile(proyections.toArray());
-                await pause();
-                break;
-
-            case '2':
-                const teamName2 = await readInput('Nombre del equipo:');
-                const goalsFor = await readInput('Número de goles del equipo <cantidad de goles del equipo o jugador que conozcas>:');
-                const gamesPlayed = await readInput('Número de partidos jugados <En cuántos partidos hizo esos goles?:');
-                const goalsDesired = await readInput('Número de goles deseados en el partido:');
-                
-                const lambda = proyections.goalsAverage(goalsFor, gamesPlayed);
-                const poissonProb = proyections.poissonProbability(goalsDesired, lambda);
-                
-                console.log(`La probabilidad de que el equipo anote exactamente ${goalsDesired} goles es: ${poissonProb.toFixed(3)}%`.green);
 
                 proyections.addPrediction({
                     teamName: teamName2,
-                    goalsFor,
-                    gamesPlayed,
-                    goalsDesired,
-                    probability: poissonProb.toFixed(3)
+                    nGamesPlayed,
+                    desiredSuccesses,
+                    dataVictoriesMatches: dataVictoriesMatchesB,
+                    dataGamesPlayed: dataGamesPlayedB,
+                    probability: probabilityB,
+                    historyProbability: historyProbabilityB,
+                    weightedProbability: weightedProbB,
+                    drawProbability
                 });
 
                 saveFile(proyections.toArray());
-                await pause();
-                break;
 
-            case '3':
-                const probRecent = await readInput('Probabilidad basada en el rendimiento reciente (en %):');
-                const probHeadToHead = await readInput('Probabilidad basada en encuentros directos (en %):');
-                const weightRecent = await readInput('Peso para el rendimiento reciente:');
-                const weightHeadToHead = await readInput('Peso para encuentros directos:');
-                
-                const weightedProb = proyections.weightedProbability(probRecent / 100, probHeadToHead / 100, weightRecent, weightHeadToHead);
-                
-                console.log(`Probabilidad ponderada: ${(weightedProb * 100).toFixed(2)}%`.green);
-
-                proyections.addPrediction({
-                    probRecent,
-                    probHeadToHead,
-                    weightRecent,
-                    weightHeadToHead,
-                    probability: (weightedProb * 100).toFixed(2)
+                const table = new Table({
+                    head: ['Nombre del equipo', 'Partidos jugados', 'Partidos ganados', 'n Ensayos', 'Éxitos deseados', 'Probabilidad. (último desempeño)', 'Por historia entre equipos', 'Por ponderación', 'Probabilidad de empate']
                 });
 
-                saveFile(proyections.toArray());
-                await pause();
-                break;
-
-            case '4':
-                const teamA = await readInput('Nombre del equipo A:');
-                const teamB = await readInput('Nombre del equipo B:');
-                const probA = await readInput('Probabilidad de empate para el equipo A (en %):');
-                const probB = await readInput('Probabilidad de empate para el equipo B (en %):');
-                const weightA = await readInput('Peso para el equipo A:');
-                const weightB = await readInput('Peso para el equipo B:');
-                
-                const weightedDrawProb = proyections.weightedProbability(probA / 100, probB / 100, weightA, weightB);
-                
-                console.log(`Probabilidad ponderada de empate entre ${teamA} y ${teamB}: ${(weightedDrawProb * 100).toFixed(2)}%`.green);
-
-                proyections.addPrediction({
-                    teamA,
-                    teamB,
-                    probA,
-                    probB,
-                    weightA,
-                    weightB,
-                    probability: (weightedDrawProb * 100).toFixed(2)
+                proyections.toTable().forEach(row => {
+                    table.push([
+                        row.teamName,
+                        row.matchesPlayed,
+                        row.victories,
+                        row.trials,
+                        row.desiredSuccesses,
+                        row.probabilityLastPerformance,
+                        row.historyProbability,
+                        row.weightedProbability,
+                        row.drawProbability
+                    ]);
                 });
 
-                saveFile(proyections.toArray());
+                console.log(table.toString());
+                proyections.exportToExcel('predictions.xlsx');
                 await pause();
                 break;
 
-            case '5':
-                console.log(proyectionsDb); // Aquí podrías implementar una tabla o formato más legible
-                await pause();
-                break;
-
-            case '6':
-                console.log('Historial de predicciones:');
-                console.log(proyections.getHistory()); // Asumo que tienes un método para obtener el historial
-                await pause();
-                break;
+            // Aquí irían los otros casos
         }
     } while (opt !== '0');
 }

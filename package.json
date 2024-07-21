@@ -11,11 +11,13 @@
   "author": "jose guadalupe deniz mancilla",
   "license": "ISC",
   "dependencies": {
+    "cli-table3": "^0.6.5",
     "colors": "^1.4.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "inquirer": "^8.0.0",
     "nodemon": "^3.1.4",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "xlsx": "^0.18.5"
   }
 }

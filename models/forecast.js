@@ -1,22 +1,28 @@
+const XLSX = require('xlsx');
 class Forecast {
     constructor() {
         this.predictions = [];
     }
-
-    loadFromArray(data = []) {
-        this.predictions = data;
-    }
-
-    toArray() {
-        return this.predictions;
-    }
-
+    
     addPrediction(prediction) {
         this.predictions.push(prediction);
     }
+    
+    loadFromArray(predictions = []) {
+        this.predictions = predictions;
+    }
+    calculateProbabilityOfP(victories, matches) {
+        return victories / matches;
+    }
 
-    calculateProbabilityOfP(victories, nMatches) {
-        return victories / nMatches;
+    binomialProbability(n, k, p) {
+        const coefficient = this.binomialCoefficient(n, k);
+        const probability = coefficient * Math.pow(p, k) * Math.pow(1 - p, n - k);
+        return probability * 100;
+    }
+
+    binomialCoefficient(n, k) {
+        return this.factorial(n) / (this.factorial(k) * this.factorial(n - k));
     }
 
     factorial(n) {
@@ -28,30 +34,43 @@ class Forecast {
         return result;
     }
 
-    binomialCoefficient(n, k) {
-        return this.factorial(n) / (this.factorial(k) * this.factorial(n - k));
-    }
-
-    binomialProbability(n, k, p) {
-        const coefficient = this.binomialCoefficient(n, k);
-        return coefficient * Math.pow(p, k) * Math.pow(1 - p, n - k) * 100;
-    }
-
-    goalsAverage(goalsFor, nMatches) {
-        return goalsFor / nMatches;
+    goalsAverage(goalsFor, matches) {
+        return goalsFor / matches;
     }
 
     poissonProbability(k, lambda) {
         const e = Math.E;
-        return (Math.pow(lambda, k) * Math.pow(e, -lambda) / this.factorial(k)) * 100;
+        const probability = (Math.pow(lambda, k) * Math.pow(e, -lambda)) / this.factorial(k);
+        return probability * 100;
     }
 
     weightedProbability(probRecent, probHeadToHead, weightRecent, weightHeadToHead) {
         const totalWeight = weightRecent + weightHeadToHead;
         return (probRecent * weightRecent + probHeadToHead * weightHeadToHead) / totalWeight;
     }
+    
+    toTable() {
+        return this.predictions.map(pred => ({
+            teamName: pred.teamName,
+            matchesPlayed: pred.dataGamesPlayed,
+            victories: pred.dataVictoriesMatches,
+            trials: pred.nGamesPlayed,
+            desiredSuccesses: pred.desiredSuccesses,
+            probabilityLastPerformance: `${parseFloat(pred.probability).toFixed(2)}%`,
+            historyProbability: `${(parseFloat(pred.historyProbability) * 100).toFixed(2)}%`,
+            weightedProbability: `${(parseFloat(pred.weightedProbability) * 100).toFixed(2)}%`,
+            drawProbability: `${(parseFloat(pred.drawProbability) * 100).toFixed(2)}%`
+        }));
+    }
+    exportToExcel(filename) {
+        const data = this.toTable();
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Predicciones');
+        XLSX.writeFile(wb, filename);
+    }
 
-    getHistory() {
+    toArray() {
         return this.predictions;
     }
 }
