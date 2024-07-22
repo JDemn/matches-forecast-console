@@ -7,13 +7,15 @@ const menuOpts = [{
     name: 'option',
     message: '¿Qué desea hacer?',
     choices: [
-        { value: '1', name: '1. Calcular predicción de éxito de un equipo en n partidos' },
-        { value: '2', name: '2. ¿Qué probabilidad hay de que un equipo meta n goles en el partido?' },
-        { value: '3', name: '3. Hacer ponderación sobre resultados tomados de desempeño reciente del equipo y resultados sobre datos históricos de encuentros entre ambos equipos' },
-        { value: '4', name: '4. Ponderación para predecir empate entre equipo A y equipo B' },
-        { value: '5', name: '5. Tabla de última predicción entre equipo A y B' },
-        { value: '6', name: '6. Historial de predicciones' },
-        { value: '0', name: '0. Salir' }
+        { value: '0', name: '0. Ingresa el nombre del equipo A y B sobre los que deseas hacer el cálculo' },
+        { value: '1', name: '1. Calcular el éxito de un equipo de ganar su siguiente encuentro' },
+        { value: '2', name: '2. Calcular probabilidad de ganar el encuntro , en base a datos históricos de encuentros directos' },
+        { value: '3', name: '3. Ponderar resultados anteriores para aumentar la probabilidad de éxito de este cálculo' },
+        { value: '4', name: '4. Calcular probabilidad de empate entre encuentros directos y tomando en cuenta empates que tuvieron en la actual jornada' },
+        { value: '5', name: '5.Calcular probabilidad que tiene un equipo de perder el encuentro' },
+        { value: '6', name: '5. Ponderar todas las probabilidades de los anteriores resultados para incrementar la probabilidad de éxito' },
+        { value: '7', name: '6. Calcular el promedio de goles que tendrán los equipos en n encuentros' },
+        { value: '10', name: '0. Mostrar tabla de posibilidad de marcador entre ambos equipos' }
     ]
 }];
 
@@ -21,6 +23,9 @@ const inquirerMenu = async () => {
     console.clear();
     console.log('============================'.green);
     console.log('  Seleccione una opción'.white);
+    console.log('  No te saltes ningún paso para obtener un 98% de éxito en la predicción'.yellow);
+    console.log('  Busca proover la aplicación de datos reales . Cada jornada tiene su tabla de resultado del rendimiento de los equipos'.white);
+    console.log('  Para los datos históricos entre equipos busca de una base de datos o recomiendo buscar en edge'.white);
     console.log('============================\n'.green);
 
     const {option} = await inquirer.prompt(menuOpts)
