@@ -2,10 +2,47 @@ const XLSX = require('xlsx');
 class Forecast {
     constructor() {
         this.predictions = [];
+        this.generalData = {
+            0 : '',
+            1 : '' ,
+            2 : 0.6,
+            3 : 0.4,
+            4 : 0,
+            5 : 0,
+            6 : 0,
+            7 : 0,
+            8 : 0,
+            9 : 0,
+            10:0
+        }
     }
 
     addPrediction(prediction) {
         this.predictions.push(prediction);
+    }
+    addTeamName( teamA , 
+        teamB , 
+        probabilityA , 
+        probabilityB , 
+        prevMatchesB , 
+        weightedProbA,
+        weightedProbB,
+        nTrials,
+        resultWeigtedProbDraw        
+    ){
+        if( teamA !== '' ) this.generalData[0] = teamA;
+        if( teamB !== '' ) this.generalData[1] = teamB;
+        if( probabilityA !== '' ) this.generalData[4] = probabilityA;
+        if(probabilityB !== '' ) this.generalData[5] = probabilityB;
+        if( probabilityB !== '' ) this.generalData[6] = prevMatchesB;
+
+        if( weightedProbA !== '' ) this.generalData[7] = weightedProbA;
+        if( weightedProbB !== '' ) this.generalData[8] = weightedProbB;
+        if( nTrials !== '' ) this.generalData[9] = nTrials;
+        if( resultWeigtedProbDraw !== '' ) this.generalData[10] = resultWeigtedProbDraw
+    }
+    cleanGralData(){
+        return this.generalData = {};
     }
 
     loadFromArray(predictions = []) {
@@ -98,10 +135,13 @@ class Forecast {
 
     exportToExcel(filename) {
         const data = this.toTable();
+        console.log("Datos a exportar:", data);
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
+        console.log(`Exportando a ${filename}...`);
         XLSX.utils.book_append_sheet(wb, ws, 'Predicciones');
         XLSX.writeFile(wb, filename);
+        console.log(`Archivo ${filename} exportado exitosamente.`);
     }
 
     toArray() {
