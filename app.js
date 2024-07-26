@@ -66,22 +66,22 @@ const main = async () => {
                 const probabilityB = parseFloat(proyections.binomialProbability(nTrials, desiredSuccesses, pB));
 
                 console.log("MP type ", typeof(gamesPlayed));
-                proyections.addPrediction({
-                    matchesPlayed: parseFloat(gamesPlayed),
-                    victories: parseFloat(prevMatches),
-                    trials: parseFloat(nTrials),
-                    desiredSuccesses: parseFloat(desiredSuccesses),
-                    probabilityLastPerformance: parseFloat(probabilityA)
-                });
-                proyections.addPrediction({
-                    matchesPlayed: parseFloat(gamesPlayed),
-                    victories: parseFloat(prevMatchesB),
-                    trials: parseFloat(nTrials),
-                    desiredSuccesses: parseFloat(desiredSuccesses),
-                    probabilityLastPerformance: parseFloat(probabilityB)
-                });
+                
 
-                proyections.addTeamName( teamA , teamB , probabilityA , probabilityB , prevMatchesB ,'','', nTrials);
+                proyections.addTeamName( 
+                    teamA ,
+                    teamB , 
+                    probabilityA , 
+                    probabilityB , 
+                    prevMatchesB ,
+                    '',
+                    '', 
+                    nTrials,
+                    '',
+                    gamesPlayed,
+                    prevMatches,
+                    desiredSuccesses
+                );
                 await pause();
                 break;
 
@@ -106,17 +106,22 @@ const main = async () => {
                 const drawProbability = (weightedProbA + weightedProbB) / 2;
                 
                 console.log("peso ", typeof(weightedProbA));
-                proyections.addPrediction({
-                    historyProbability: parseFloat(weightedProbA),
-                    drawProbability : parseFloat(drawProbability)
-                });
-
-                proyections.addPrediction({
-                    historyProbability: parseFloat(weightedProbB),
-                    drawProbability : parseFloat(drawProbability)
-                });
-                
-                proyections.addTeamName( '','' ,'' ,'' ,'' , weightedProbA , weightedProbB ,'');
+                        
+                proyections.addTeamName( 
+                    '',
+                    '', 
+                    '', 
+                    '', 
+                    '',
+                    weightedProbA,
+                    weightedProbB, 
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    drawProbability
+                );
                 //console.log(table.toString());
                 
                 await pause();
@@ -135,13 +140,27 @@ const main = async () => {
                 const weightedProbTeamA = proyections.weightedProbability(probRecenTeamA, probHeadToHeadTeamA, weigthR, weigthFtF );
                 const weightedProbTeamB = proyections.weightedProbability(probRecentTeamB, probHeadToHeadTeamB, weigthR, weigthFtF );
 
-                proyections.addPrediction({
-                    weightedProbability: parseFloat(weightedProbTeamA)
-                });
-                proyections.addPrediction({
-                    weightedProbability: parseFloat(weightedProbTeamB)
-                });
-
+                
+                proyections.addTeamName(
+                    '', 
+                    '', 
+                    '', 
+                    '', 
+                    '', 
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    weightedProbTeamA,
+                    '',
+                    '',
+                    '',
+                    weightedProbTeamB    
+                )
                 await pause()
                 break;
             case '4':
@@ -160,9 +179,7 @@ const main = async () => {
 
                 const weightedProbDraw = proyections.weightedProbability(probRecentDraw, probHeadToHeadDraw, proyections.generalData[2], proyections.generalData[3]);
                 const resultWeigtedProbDraw = weightedProbDraw * 100
-                proyections.addPrediction({
-                    drawProbability: parseFloat(resultWeigtedProbDraw.toFixed(2))
-                });
+                
                 proyections.addTeamName( '','' ,'' ,'' ,'' , '' ,'' ,'',resultWeigtedProbDraw);
                 await pause()
                 break;
@@ -180,13 +197,28 @@ const main = async () => {
                 const probabilityOfLossA = proyections.binomialProbability(proyections.generalData[9], desiredSuccesses1, teamALossesPrediction);
                 const probabilityOfLossB = proyections.binomialProbability(proyections.generalData[9], desiredSuccesses1, teamBLossesPrediction);
 
-                proyections.addPrediction({
-                    losseProbability: parseFloat(probabilityOfLossA)
-                });
-                proyections.addPrediction({
-                    losseProbability: parseFloat(probabilityOfLossB)
-                });
-
+                
+                proyections.addTeamName( 
+                    '', 
+                    '', 
+                    '', 
+                    '', 
+                    '', 
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    probabilityOfLossA,
+                    '',
+                    '',
+                    '',
+                    probabilityOfLossB  
+                )
                 await pause()
                 break;
             case '6':
@@ -202,7 +234,7 @@ const main = async () => {
                 const probDraw = proyections.generalData[10];
 
 
-                const { weightedProbWinA, weightedProbWinB } = proyections.weightedProbabilityAllResults(
+                proyections.weightedProbabilityAllResults(
                     ponderateProbRecentTeamA,
                     ponderateProbRecentTeamB,
                     ponderateProbHeadToHeadTeamA,
@@ -212,11 +244,32 @@ const main = async () => {
                     proyections.generalData[3]
                 );
 
+                 //guardar la data pendiente de este objeto en el state de la clase           
                 proyections.addPrediction({
-                    ProbabilityToWinTakenInConsiderationAllPrevData: parseFloat(weightedProbWinA)
+                    matchesPlayed: parseFloat(proyections.generalData[11]),
+                    victories: parseFloat(proyections.generalData[12]),
+                    trials: parseFloat(proyections.generalData[9]),
+                    desiredSuccesses: parseFloat(proyections.generalData[13]),
+                    probabilityLastPerformance: parseFloat(proyections.generalData[4]),                   
+                    historyProbability: parseFloat(proyections.generalData[7]),
+                    drawProbability : parseFloat(proyections.generalData[14]),
+                    weightedProbability: parseFloat(proyections.generalData[15]),
+                    drawProbability: parseFloat(proyections.generalData[10]),
+                    losseProbability: parseFloat(proyections.generalData[16]),
+                    ProbabilityToWinTakenInConsiderationAllPrevData: parseFloat(proyections.generalData[17]),
                 });
                 proyections.addPrediction({
-                    ProbabilityToWinTakenInConsiderationAllPrevData: parseFloat(weightedProbWinB)
+                    matchesPlayed: parseFloat(proyections.generalData[11]),
+                    victories: parseFloat(proyections.generalData[6]),
+                    trials: parseFloat(proyections.generalData[9]),
+                    desiredSuccesses: parseFloat(proyections.generalData[13]),
+                    probabilityLastPerformance: parseFloat(proyections.generalData[5]),
+                    historyProbability: parseFloat(proyections.generalData[8]),
+                    drawProbability : parseFloat(proyections.generalData[14]),
+                    weightedProbability: parseFloat(proyections.generalData[19]),
+                    drawProbability: parseFloat(proyections.generalData[10]),
+                    losseProbability: parseFloat(proyections.generalData[20]),
+                    ProbabilityToWinTakenInConsiderationAllPrevData: parseFloat(proyections.generalData[18])
                 });
 
                 saveFile(proyections.toArray());

@@ -13,14 +13,23 @@ class Forecast {
             7 : 0,
             8 : 0,
             9 : 0,
-            10:0
+            10:0 ,
+            11 : 0,
+            12 : 0,
+            13 : 0,
+            14 : 0,
+            15 : 0,
+            16 : 0,
+            17 : 0
         }
     }
 
     addPrediction(prediction) {
         this.predictions.push(prediction);
     }
-    addTeamName( teamA , 
+
+    addTeamName( 
+        teamA , 
         teamB , 
         probabilityA , 
         probabilityB , 
@@ -28,18 +37,38 @@ class Forecast {
         weightedProbA,
         weightedProbB,
         nTrials,
-        resultWeigtedProbDraw        
+        resultWeigtedProbDraw,
+        gamesPlayed,
+        prevMatches,
+        desiredSuccesses,
+        drawProbability,
+        weightedProbTeamA,
+        probabilityOfLossA,
+        weightedProbWinA,
+        weightedProbWinB,
+        weightedProbTeamB,
+        probabilityOfLossB    
     ){
         if( teamA !== '' ) this.generalData[0] = teamA;
         if( teamB !== '' ) this.generalData[1] = teamB;
         if( probabilityA !== '' ) this.generalData[4] = probabilityA;
         if(probabilityB !== '' ) this.generalData[5] = probabilityB;
-        if( probabilityB !== '' ) this.generalData[6] = prevMatchesB;
+        if( prevMatchesB !== '' ) this.generalData[6] = prevMatchesB;
 
         if( weightedProbA !== '' ) this.generalData[7] = weightedProbA;
         if( weightedProbB !== '' ) this.generalData[8] = weightedProbB;
         if( nTrials !== '' ) this.generalData[9] = nTrials;
-        if( resultWeigtedProbDraw !== '' ) this.generalData[10] = resultWeigtedProbDraw
+        if( resultWeigtedProbDraw !== '' ) this.generalData[10] = resultWeigtedProbDraw;
+        if( gamesPlayed !== '') this.generalData[11] = gamesPlayed;
+        if( prevMatches !== '' ) this.generalData[12] = prevMatches;
+        if( desiredSuccesses !== '' ) this.generalData[13] = desiredSuccesses;
+        if( drawProbability !== '' ) this.generalData[14] = drawProbability;
+        if( weightedProbTeamA !== '' ) this.generalData[15] = weightedProbTeamA;
+        if( probabilityOfLossA !== '' ) this.generalData[16] = probabilityOfLossA;
+        if( weightedProbWinA !== '' ) this.generalData[17] = weightedProbWinA;
+        if( weightedProbWinB !== '' ) this.generalData[18] = weightedProbWinB;
+        if( weightedProbTeamB !== '' ) this.generalData[19] = weightedProbTeamB;
+        if( probabilityOfLossB !== '' ) this.generalData[20] = probabilityOfLossB
     }
     cleanGralData(){
         return this.generalData = {};
@@ -129,20 +158,72 @@ class Forecast {
         // Probabilidades ponderadas de ganar
         const weightedProbWinA = (adjustedProbA / totalProb) * 100;
         const weightedProbWinB = (adjustedProbB / totalProb) * 100;
-
+        this.addTeamName(
+            '', 
+            '', 
+            '', 
+            '', 
+            '', 
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            weightedProbWinA,
+            weightedProbWinB    
+        )
         return { weightedProbWinA, weightedProbWinB };
     }
 
     exportToExcel(filename) {
-        const data = this.toTable();
-        console.log("Datos a exportar:", data);
+        // Organiza los datos en un formato adecuado para Excel
+        const data = [
+            {
+                "Fecha de cálculo": new Date(),
+                "Nombre del equipo": this.generalData[0], // Equipo A
+                "Partidos jugados MP": this.generalData[11],
+                "Partidos ganados W": this.generalData[12],
+                "n Ensayos": this.generalData[9],
+                "Éxitos deseados": this.generalData[13],
+                "Probabilidad. (último desempeño)": this.generalData[4],
+                "Por historia entre equipos": this.generalData[7],
+                "Por ponderación": this.generalData[15],
+                "Probabilidad de empate": this.generalData[14],
+                "Probabilidad que pierda el encuentro": this.generalData[16],
+                "Prob de ganar ponderando todos los resultados anteriores": this.generalData[17]
+            },
+            {
+                "Fecha de cálculo": new Date(),
+                "Nombre del equipo": this.generalData[1], // Equipo B
+                "Partidos jugados MP": this.generalData[11],
+                "Partidos ganados W": this.generalData[12],
+                "n Ensayos": this.generalData[9],
+                "Éxitos deseados": this.generalData[13],
+                "Probabilidad. (último desempeño)": this.generalData[5],
+                "Por historia entre equipos": this.generalData[8],
+                "Por ponderación": this.generalData[19],
+                "Probabilidad de empate": this.generalData[14],
+                "Probabilidad que pierda el encuentro": this.generalData[20],
+                "Prob de ganar ponderando todos los resultados anteriores": this.generalData[18]
+            }
+        ];
+    
+        // Convertir datos a una hoja de Excel
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
-        console.log(`Exportando a ${filename}...`);
         XLSX.utils.book_append_sheet(wb, ws, 'Predicciones');
+    
+        // Guardar archivo Excel
+        console.log(`Exportando a ${filename}...`);
         XLSX.writeFile(wb, filename);
         console.log(`Archivo ${filename} exportado exitosamente.`);
     }
+    
 
     toArray() {
         return this.predictions;

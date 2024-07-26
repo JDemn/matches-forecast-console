@@ -14,12 +14,12 @@ function calcularProbabilidadVictoria(pctEquipo, pctOponente) {
 // Datos de los equipos
 const equipos = [
     {
-        nombre: 'Tecoclotes de los dos laredos',
-        pct: 0.581
+        nombre: 'Royals',
+        pct: 0.544
     },
     {
-        nombre: 'Toros de tijuana',
-        pct: 0.541
+        nombre: 'Cubs',
+        pct: 0.471
     }
 ];
 
