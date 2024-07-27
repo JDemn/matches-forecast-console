@@ -3,8 +3,8 @@ class Forecast {
     constructor() {
         this.predictions = [];
         this.generalData = {
-            0 : '',
-            1 : '' ,
+            0 : '', // Team A
+            1 : '', // Team B
             2 : 0.6,
             3 : 0.4,
             4 : 0,
@@ -13,7 +13,7 @@ class Forecast {
             7 : 0,
             8 : 0,
             9 : 0,
-            10:0 ,
+            10:0,
             11 : 0,
             12 : 0,
             13 : 0,
@@ -21,9 +21,9 @@ class Forecast {
             15 : 0,
             16 : 0,
             17 : 0,
-            18 : 0,
-            19 : 0,
-            20 : 0
+            18: 0, // Added
+            19: 0, // Added
+            20: 0  // Added
         }
     }
 
@@ -51,35 +51,37 @@ class Forecast {
         weightedProbWinB,
         weightedProbTeamB,
         probabilityOfLossB    
-    ){
-        if( teamA !== '' ) this.generalData[0] = teamA;
-        if( teamB !== '' ) this.generalData[1] = teamB;
-        if( probabilityA !== '' ) this.generalData[4] = probabilityA;
-        if(probabilityB !== '' ) this.generalData[5] = probabilityB;
-        if( prevMatchesB !== '' ) this.generalData[6] = prevMatchesB;
+    ) {
+        if (teamA !== '') this.generalData[0] = teamA;
+        if (teamB !== '') this.generalData[1] = teamB;
+        if (probabilityA !== '') this.generalData[4] = probabilityA;
+        if (probabilityB !== '') this.generalData[5] = probabilityB;
+        if (prevMatchesB !== '') this.generalData[6] = prevMatchesB;
 
-        if( weightedProbA !== '' ) this.generalData[7] = weightedProbA;
-        if( weightedProbB !== '' ) this.generalData[8] = weightedProbB;
-        if( nTrials !== '' ) this.generalData[9] = nTrials;
-        if( resultWeigtedProbDraw !== '' ) this.generalData[10] = resultWeigtedProbDraw;
-        if( gamesPlayed !== '') this.generalData[11] = gamesPlayed;
-        if( prevMatches !== '' ) this.generalData[12] = prevMatches;
-        if( desiredSuccesses !== '' ) this.generalData[13] = desiredSuccesses;
-        if( drawProbability !== '' ) this.generalData[14] = drawProbability;
-        if( weightedProbTeamA !== '' ) this.generalData[15] = weightedProbTeamA;
-        if( probabilityOfLossA !== '' ) this.generalData[16] = probabilityOfLossA;
-        if( weightedProbWinA !== '' ) this.generalData[17] = weightedProbWinA;
-        if( weightedProbWinB !== '' ) this.generalData[18] = weightedProbWinB;
-        if( weightedProbTeamB !== '' ) this.generalData[19] = weightedProbTeamB;
-        if( probabilityOfLossB !== '' ) this.generalData[20] = probabilityOfLossB
+        if (weightedProbA !== '') this.generalData[7] = weightedProbA;
+        if (weightedProbB !== '') this.generalData[8] = weightedProbB;
+        if (nTrials !== '') this.generalData[9] = nTrials;
+        if (resultWeigtedProbDraw !== '') this.generalData[10] = resultWeigtedProbDraw;
+        if (gamesPlayed !== '') this.generalData[11] = gamesPlayed;
+        if (prevMatches !== '') this.generalData[12] = prevMatches;
+        if (desiredSuccesses !== '') this.generalData[13] = desiredSuccesses;
+        if (drawProbability !== '') this.generalData[14] = drawProbability;
+        if (weightedProbTeamA !== '') this.generalData[15] = weightedProbTeamA;
+        if (probabilityOfLossA !== '') this.generalData[16] = probabilityOfLossA;
+        if (weightedProbWinA !== '') this.generalData[17] = weightedProbWinA;
+        if (weightedProbWinB !== '') this.generalData[18] = weightedProbWinB;
+        if (weightedProbTeamB !== '') this.generalData[19] = weightedProbTeamB;
+        if (probabilityOfLossB !== '') this.generalData[20] = probabilityOfLossB;
     }
-    cleanGralData(){
+
+    cleanGralData() {
         return this.generalData = {};
     }
 
     loadFromArray(predictions = []) {
         this.predictions = predictions;
     }
+
     calculateProbabilityOfP(victories, matches) {
         return victories / matches;
     }
@@ -117,12 +119,15 @@ class Forecast {
         const totalWeight = weightRecent + weightHeadToHead;
         return (probRecent * weightRecent + probHeadToHead * weightHeadToHead) / totalWeight;
     }
+
     historicalDrawProbability(draws, totalMatches) {
-        return (draws / totalMatches);
+        return draws / totalMatches;
     }
-    calculateProbabilityOfQ = (losses, matches) => {
+
+    calculateProbabilityOfQ(losses, matches) {
         return losses / matches;
     }
+
     toTable() {
         return this.predictions.map(pred => ({
             teamDate: pred.Date,
@@ -131,7 +136,7 @@ class Forecast {
             victories: pred.dataVictoriesMatches,
             trials: pred.nGamesPlayed,
             desiredSuccesses: pred.desiredSuccesses,
-            probabilityLastPerformance: `${parseFloat(pred.probability).toFixed(2)}%`,
+            probabilityLastPerformance: `${parseFloat(pred.probability * 100).toFixed(2)}%`,
             historyProbability: `${(parseFloat(pred.historyProbability) * 100).toFixed(2)}%`,
             weightedProbability: `${(parseFloat(pred.weightedProbability) * 100).toFixed(2)}%`,
             drawProbability: `${(parseFloat(pred.drawProbability) * 100).toFixed(2)}%`,
@@ -140,7 +145,6 @@ class Forecast {
         }));
     }
 
-    // Ponderar todos los resultados anteriores para predecir éxito de un equipo
     weightedProbabilityAllResults(
         probRecentA,   // Probabilidad reciente de ganar para el Equipo A
         probRecentB,   // Probabilidad reciente de ganar para el Equipo B
@@ -150,7 +154,6 @@ class Forecast {
         weightRecent,  // Peso para la probabilidad reciente
         weightHeadToHead // Peso para la probabilidad de enfrentamientos directos
     ) {
-    
         // Calcula la probabilidad de ganar ajustada
         const adjustedProbA = probRecentA * weightRecent + probHeadToHeadA * weightHeadToHead;
         const adjustedProbB = probRecentB * weightRecent + probHeadToHeadB * weightHeadToHead;
@@ -161,6 +164,7 @@ class Forecast {
         // Probabilidades ponderadas de ganar
         const weightedProbWinA = (adjustedProbA / totalProb) * 100;
         const weightedProbWinB = (adjustedProbB / totalProb) * 100;
+
         this.addTeamName(
             '', 
             '', 
@@ -179,7 +183,7 @@ class Forecast {
             '',
             weightedProbWinA,
             weightedProbWinB    
-        )
+        );
         return { weightedProbWinA, weightedProbWinB };
     }
 
@@ -226,11 +230,11 @@ class Forecast {
         XLSX.writeFile(wb, filename);
         console.log(`Archivo ${filename} exportado exitosamente.`);
     }
-    
 
     toArray() {
         return this.predictions;
     }
 }
+
 
 module.exports = Forecast;

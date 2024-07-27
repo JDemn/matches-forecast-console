@@ -14,7 +14,8 @@ const menuOpts = [{
         { value: '5', name: '5.Calcular probabilidad que tiene un equipo de perder el encuentro'.yellow },
         { value: '6', name: '6. Ponderar todas las probabilidades de los anteriores resultados para incrementar la probabilidad de éxito'.yellow },
         { value: '7', name: '7. Calcular el promedio de goles que tendrán los equipos en n encuentros'.yellow },
-        { value: '10', name: '8. Mostrar tabla de posibilidad de marcador entre ambos equipos'.yellow }
+        { value: '10', name: '8. Mostrar tabla de posibilidad de marcador entre ambos equipos'.yellow },
+        { value: '11', name: '10. Game pronostic'.red }
     ]
 }];
 
