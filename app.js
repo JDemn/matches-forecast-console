@@ -281,25 +281,26 @@ const main = async () => {
                 const n = 1;    // Número total de ensayos
                 const k = 1;     // Número de éxitos deseados
 
-                const teamAa = await readInput("Nombre del equipo A");
-                const vict = parseFloat(await readInput("Victorias equipo A"));
-                const match = parseFloat(await readInput("Partidos jugados equipo A"));
+                const teamAa = await readInput("Nombre del equipo A".bgCyan);
+                const match = parseFloat(await readInput("Partidos jugados del equipo A (MP)".bgCyan));
+                const vict = parseFloat(await readInput("Victorias equipo A (W)".bgCyan));
                 const p = game.calculateProbabilityOfP(vict, match);
                 const probAa = game.binomialProbability(n, k, p);
 
-                const teambB = await readInput("Nombre del equipo B");
-                const victt = parseFloat(await readInput("Victorias equipo B"));
-                const matchc = parseFloat(await readInput("Partidos jugados equipo B"));
+                const teambB = await readInput("Nombre del equipo B".bgBlue);
+                const matchc = parseFloat(await readInput("Partidos jugados equipo B  (MP)".bgBlue));
+                const victt = parseFloat(await readInput("Victorias equipo B (W)".bgBlue));
                 const p2 = game.calculateProbabilityOfP(victt, matchc);
                 const probBb = game.binomialProbability(n, k, p2);
 
-                console.log(`La probabilidad de tener exactamente ${k} éxitos en ${n} ensayos es: ${probAa.toFixed(2)}% `);
+                console.log(`La probabilidad de tener exactamente ${k} éxitos en ${n} ensayos es: ${probAa.toFixed(2)}% `.cyan);
+                console.log(`La probabilidad de que B tenga exactamente ${k} éxitos en ${n} ensayos es: ${probBb.toFixed(2)}% `.cyan);
 
                 // Quién gana en base a encuentros directos
-                const headToHeadMatches = parseFloat(await readInput("Número de encuentros directos"));
-                const headToheadAwin = parseFloat(await readInput("Encuentros directos ganados por equipo A"));
+                const headToHeadMatches = parseFloat(await readInput("Número de encuentros directos (MP)".blue));
+                const headToheadAwin = parseFloat(await readInput("Encuentros directos ganados por equipo A (W)".bgCyan));
                 const t = game.calculateProbabilityOfP(headToheadAwin, headToHeadMatches);
-                const headToheadBwin = parseFloat(await readInput("Encuentros directos ganados por equipo B"));
+                const headToheadBwin = parseFloat(await readInput("Encuentros directos ganados por equipo B".bgBlue));
                 const j = game.calculateProbabilityOfP(headToheadBwin, headToHeadMatches);
 
                 const probtoWinAhTh = game.binomialProbability(n, k, t);
@@ -322,11 +323,11 @@ const main = async () => {
 
                 const probHeadToHeadDraww = game.historicalDrawProbability(drawsNumber, totalMatches);
 
-                console.log("Calcular prob de empate en base a ultimos encuentros no directos")
-                const totalMatchesA = parseFloat(await readInput("Número total de partidos equipo A MP"));
-                const drawsNumberA = parseFloat(await readInput("Número de empates equipo A"));
-                const totalMatchesB = parseFloat(await readInput("Número total de partidos equipo B"));
-                const drawsNumberB = parseFloat(await readInput("Número de empates equipo B"));
+                console.log("Calcular prob de empate en base a ultimos encuentros no directos".yellow)
+                const totalMatchesA = parseFloat(await readInput("Número total de partidos jugados por equipo A (MP)".bgCyan));
+                const drawsNumberA = parseFloat(await readInput("Número de empates equipo A".bgCyan));
+                const totalMatchesB = parseFloat(await readInput("Número total de partidos jugados por equipo B (MP)".bgBlue));
+                const drawsNumberB = parseFloat(await readInput("Número de empates equipo B (D)".bgBlue));
 
                 const probRecentDrawA = game.historicalDrawProbability(drawsNumberA, totalMatchesA);
                 const probRecentDrawB = game.historicalDrawProbability(drawsNumberB, totalMatchesB);
@@ -337,34 +338,36 @@ const main = async () => {
                 const weightedProbDraww = game.weightedProbability(probRecentDraw1, probHeadToHeadDraww, weightRecentt, weightHeadToHeadd);
 
                 // Probabilidad de pérdida
-                console.log("probabilidad de perder el siguiente encuentro".red)
-                const MpA = parseFloat(await readInput("Número de partidos jugados donde perdió A MP"));
-                const lossesA = parseFloat(await readInput("Número de partidos perdidos por A"));
+                console.log("probabilidad de perder el siguiente encuentro".yellow);
+
+                const MpA = parseFloat(await readInput("Número de partidos jugados donde perdió el quipo A (MP)".bgCyan));
+                const lossesA = parseFloat(await readInput("Número de partidos perdidos por A (L)".bgCyan));
 
                 const q = game.calculateProbabilityOfQ(lossesA, MpA);
                 const probabilityOfLossAa = game.binomialProbability(n, k, q);
 
-                console.log(`La probabilidad de tener exactamente ${k} pérdidas en ${n} partidos es: ${probabilityOfLossAa.toFixed(2)}%`);
+                console.log(`La probabilidad de tener exactamente ${k} pérdidas en ${n} partidos es: ${probabilityOfLossAa.toFixed(2)}%`.yellow);
 
-                console.log("probabilidad de perder el siguiente encuentro B".red)
-                const MpB = parseFloat(await readInput("Número de partidos jugados donde perdió B MP"));
-                const lossesB = parseFloat(await readInput("Número de partidos perdidos por B"));
-
+                console.log("probabilidad de perder el siguiente encuentro del equipo B".yellow)
+                const MpB = parseFloat(await readInput("Número de partidos jugados donde perdió B (MP)".bgBlue));
+                const lossesB = parseFloat(await readInput("Número de partidos perdidos por B".bgBlue));
+        
                 const rl = game.calculateProbabilityOfQ(lossesB, MpB);
                 const probabilityOfLossBb = game.binomialProbability(n, k, rl);
-
+                console.log(`La probabilidad de B , de tener exactamente ${k} pérdidas en ${n} partidos es: ${probabilityOfLossBb.toFixed(2)}%`.yellow);
+                
                 // Goles por partido
-                console.log("Calcular el número de goles por partidos");
-                const Nmatches = parseFloat(await readInput("Número de partidos"));
-                const goalsFa = parseFloat(await readInput("Goles a favor de A (mínimo últimos 5 partidos)"));
-                const goalsToPredictA = parseFloat(await readInput("Número de goles que quiera predecir en el siguiente partido"));
+                console.log("Calcular el número de goles por partidos".yellow);
+                const Nmatches = parseFloat(await readInput("Número de partidos jugados. (mínimo últimos 5 partidos) . **(MP)**".bgCyan));
+                const goalsFa = parseFloat(await readInput("Goles a favor de A (GF) ".bgCyan));
+                const goalsToPredictA = parseFloat(await readInput("Número de goles que quiera predecir en el siguiente partido".bgCyan));
 
                 const lambda = game.goalsAverage(goalsFa, Nmatches);
                 const golesFor = goalsToPredictA;
 
-                const NmatchesB = parseFloat(await readInput("Número de partidos equipo B"));
-                const goalsFb = parseFloat(await readInput("Goles a favor de B"));
-                const goalsToPredictB = parseFloat(await readInput("Número de goles que quiera predecir en el siguiente partido"));
+                const NmatchesB = parseFloat(await readInput("Número de partidos equipo B".bgBlue));
+                const goalsFb = parseFloat(await readInput("Goles a favor de B".bgBlue));
+                const goalsToPredictB = parseFloat(await readInput("Número de goles que quiera predecir en el siguiente partido".bgBlue));
 
                 const lambdaB = game.goalsAverage(goalsFb, NmatchesB);
                 const golesForb = goalsToPredictB;
@@ -372,8 +375,8 @@ const main = async () => {
                 const poisonTeamA = game.poissonProbability(golesFor, lambda);
                 const poisonTeamB = game.poissonProbability(golesForb, lambdaB);
 
-                console.log(`La probabilidad de que el equipo A anote exactamente ${k} goles es: ${poisonTeamA.toFixed(3)}`);
-                console.log(`La probabilidad de que el equipo B anote exactamente ${k} goles es: ${poisonTeamB.toFixed(3)}`);
+                console.log(`La probabilidad de que el equipo A anote exactamente ${k} goles es: ${poisonTeamA.toFixed(3)}`.yellow);
+                console.log(`La probabilidad de que el equipo B anote exactamente ${k} goles es: ${poisonTeamB.toFixed(3)}`.yellow);
 
 
                 // ponderacion 
