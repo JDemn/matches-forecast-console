@@ -54,10 +54,10 @@ const main = async () => {
                     teamName: teamB
                 });
 
-                const nTrials = parseInt(await readInput("Número de ensayos en los que te gustaría hacer la predicción ?"));
-                const desiredSuccesses = parseInt(await readInput("Números de casos de éxito a predecir. Ejemplo: 1 significa el siguiente encuentro etc."));
-                const prevMatches = parseInt(await readInput("Ingresar número de Partidos ganados (W)"));
-                const gamesPlayed = parseInt(await readInput("Ingresar número de Partidos jugados MP"));
+                const nTrials = parseFloat(await readInput("Número de ensayos en los que te gustaría hacer la predicción ?"));
+                const desiredSuccesses = parseFloat(await readInput("Números de casos de éxito a predecir. Ejemplo: 1 significa el siguiente encuentro etc."));
+                const prevMatches = parseFloat(await readInput("Ingresar número de Partidos ganados (W)"));
+                const gamesPlayed = parseFloat(await readInput("Ingresar número de Partidos jugados MP"));
 
                 const pA = projections.calculateProbabilityOfP(prevMatches, gamesPlayed);
                 const probabilityA = parseFloat(projections.binomialProbability(nTrials, desiredSuccesses, pA));
@@ -186,11 +186,11 @@ const main = async () => {
                 break;
 
             case '5':
-                const desiredSuccesses1 = parseInt(await readInput("Fracasos a predecir. Ejemplo: 1 significa el siguiente encuentro etc."));
-                const losseTheGameTotalMatches = parseInt(await readInput(`Número de partidos perdidos de ${projections.generalData[0]}`));
-                const probLossesInMatches = parseInt(await readInput(`Número de partidos disputados donde perdió ${projections.generalData[0]}`));
-                const lossesByTeamB = parseInt(await readInput(`Número de partidos perdidos de ${projections.generalData[1]}`));
-                const probLossesInMatchesB = parseInt(await readInput(`Número de partidos disputados donde perdió ${projections.generalData[1]}`));
+                const desiredSuccesses1 = parseFloat(await readInput("Fracasos a predecir. Ejemplo: 1 significa el siguiente encuentro etc."));
+                const losseTheGameTotalMatches = parseFloat(await readInput(`Número de partidos perdidos de ${projections.generalData[0]}`));
+                const probLossesInMatches = parseFloat(await readInput(`Número de partidos disputados donde perdió ${projections.generalData[0]}`));
+                const lossesByTeamB = parseFloat(await readInput(`Número de partidos perdidos de ${projections.generalData[1]}`));
+                const probLossesInMatchesB = parseFloat(await readInput(`Número de partidos disputados donde perdió ${projections.generalData[1]}`));
 
                 const teamALossesPrediction = projections.calculateProbabilityOfQ(losseTheGameTotalMatches, probLossesInMatches);
                 const teamBLossesPrediction = projections.calculateProbabilityOfQ(lossesByTeamB, probLossesInMatchesB);
@@ -314,10 +314,10 @@ const main = async () => {
                 const weightedProbA1 = game.weightedProbability(probAa, probHeadToHeadA, weightRecentt, weightHeadToHeadd);
                 const weightedProB2 = game.weightedProbability(probBb, probHeadToHeadB, weightRecentt, weightHeadToHeadd);
 
-                console.log(`Probabilidad ponderada de que el EQUIPO A gane: ${weightedProbA1}%`);
-                console.log(`Probabilidad ponderada de que el EQUIPO B gane: ${weightedProB2}%`);
+                console.log(`Probabilidad ponderada de que el EQUIPO A gane: ${weightedProbA1}%`.yellow);
+                console.log(`Probabilidad ponderada de que el EQUIPO B gane: ${weightedProB2}%`.yellow);
 
-                const totalMatches = parseFloat(await readInput("Número total de encuentros directos"));
+                const totalMatches = parseFloat(await readInput("Ingresa el Número total de encuentros directos MP. predecir empate"));
                 const drawsNumber = parseFloat(await readInput("Número de empates en encuentros directos"));
 
                 const probHeadToHeadDraww = game.historicalDrawProbability(drawsNumber, totalMatches);
@@ -386,19 +386,19 @@ const main = async () => {
 
                 game.match['teamName'] = teamAa;
                 game.match['probTowinLastPerformance'] = (probAa).toFixed(2);
-                game.match['probtoWinHeadToHead'] = (weightedProbA1 * 100).toFixed(2);
+                game.match['probtoWinHeadToHead'] = weightedProbA1;
                 game.match['probToDraw'] = (weightedProbDraww * 100).toFixed(2);
                 game.match['probToLost'] = (probabilityOfLossAa).toFixed(2);
                 game.match['probToWinAponderada'] = (weightedProbWinA).toFixed(2);
-                game.match['goalsPerMatchAverage'] = (poisonTeamA).toFixed(2);
+                game.match['goalsPerMatchAverage'] = (lambda).toFixed(2);
             
                 game.matchB['teamName'] = teambB;
                 game.matchB['probTowinLastPerformance'] = (probBb).toFixed(2);
-                game.matchB['probtoWinHeadToHead'] = (weightedProB2 * 100).toFixed(2);
+                game.matchB['probtoWinHeadToHead'] = weightedProB2;
                 game.matchB['probToDraw'] = (weightedProbDraww * 100).toFixed(2);
                 game.matchB['probToLost'] = (probabilityOfLossBb).toFixed(2);
                 game.matchB['probToWinBponderada'] = (weightedProbWinB).toFixed(2);
-                game.matchB['goalsPerMatchAverage'] = (poisonTeamB).toFixed(2);
+                game.matchB['goalsPerMatchAverage'] = (lambdaB).toFixed(2);
 
                 console.log("Probabilidad de que gane el equipo A:", game.match);
                 console.log("Probabilidad de que gane el equipo B:", game.matchB);
