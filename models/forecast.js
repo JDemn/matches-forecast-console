@@ -25,6 +25,18 @@ class Forecast {
             19: 0, // Added
             20: 0  // Added
         }
+        this.probGoalsA = {
+            0 : 0,
+            1 : 0,
+            2 : 0,
+            3 : 0
+        }
+        this.probGoalsB = {
+            0 : 0,
+            1 : 0,
+            2 : 0,
+            3 : 0
+        }
     }
 
     addPrediction(prediction) {
@@ -234,6 +246,34 @@ class Forecast {
     toArray() {
         return this.predictions;
     }
+
+    calcularProbabilidadMarcador(probGolesA, probGolesB) {
+        const combinaciones = ['0-0', '0-1', '0-2', '0-3', '1-0', '1-1', '1-2', '1-3', '2-0', '2-1', '2-2', '2-3', '3-0', '3-1', '3-2', '3-3'];
+        const probabilidades = {};
+      
+        combinaciones.forEach(comb => {
+          const [golesA, golesB] = comb.split('-').map(Number);
+          const probGolesAEquipo = probGolesA[golesA] || 0;
+          const probGolesBEquipo = probGolesB[golesB] || 0;
+          
+          probabilidades[comb] = probGolesAEquipo * probGolesBEquipo;
+        });
+      
+        return probabilidades;
+    }
+    goalsAverage=(GoalsFor,nmaches)=>{
+        if(nmaches === 0 ) return 0
+        let average = GoalsFor/nmaches
+        console.log("Promedio de goles por partido",average)
+        return average
+    }
+    /*
+    poissonProbability(k, lambda) {
+        // P(X = k) = (lambda^k * e^(-lambda)) / k!
+        const e = Math.E;
+        const probability = (Math.pow(lambda, k) * Math.pow(e, -lambda)) / factorial(k);
+        return probability *100;
+    } */
 }
 
 

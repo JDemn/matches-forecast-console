@@ -13,9 +13,9 @@ const menuOpts = [{
         { value: '4', name: '4. Calcular probabilidad de empate entre encuentros directos y tomando en cuenta empates que tuvieron en la actual jornada'.yellow },
         { value: '5', name: '5.Calcular probabilidad que tiene un equipo de perder el encuentro'.yellow },
         { value: '6', name: '6. Ponderar todas las probabilidades de los anteriores resultados para incrementar la probabilidad de éxito'.yellow },
-        { value: '7', name: '7. Calcular el promedio de goles que tendrán los equipos en n encuentros'.yellow },
+        { value: '7', name: '7. Adivinar marcador del encuentro.'.green },
         { value: '10', name: '8. Mostrar tabla de posibilidad de marcador entre ambos equipos'.yellow },
-        { value: '11', name: '10. Game pronostic'.red }
+        { value: '11', name: '10. Game pronostic'.green }
     ]
 }];
 

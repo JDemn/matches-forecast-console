@@ -93,13 +93,11 @@ class GamePronostic {
         const probability = (Math.pow(lambda, k) * Math.pow(e, -lambda)) / this.factorial(k);  // Cambiar aquí
         return probability * 100;
     }
-    weightedWinningProbability(probToWin, probToDraw, probToLose, weightWin, weightDraw, weightLose , homeAdvantage) {
+    weightedWinningProbability(probToWin, probToDraw, probToLose, weightWin, weightDraw, weightLose ) {
     
         probToWin = probToWin || 0;
         probToDraw = probToDraw || 0;
         probToLose = probToLose || 0;
-        
-        if(homeAdvantage) probToWin *= homeAdvantage;
 
         const totalProbability = probToWin + probToDraw + probToLose;
 

@@ -275,6 +275,53 @@ const main = async () => {
                 console.log("La data del primer pronóstico se ha limpiado".red, projections.generalData);
                 await pause();
                 break;
+            case '7':
+                console.log("Calcular promedio de goles de un equipo para después adivinar marcador".bgBlack);
+
+                const GoalsFor = parseFloat(await readInput("Número de goles a favor de Team A (GF)".bgCyan));
+                const nMaches = parseFloat(await readInput("Número de partidos (MP)".bgCyan));
+
+                const GoalsForB = parseFloat(await readInput("Número de goles a favor de team B (GF)".bgBlue));
+                const nMachesB = parseFloat(await readInput("Número de partidos B (MP)".bgBlue));
+
+
+                const lambdaGoalsFA = projections.goalsAverage(GoalsFor, nMaches);
+                const lambdaGoalsFB = projections.goalsAverage(GoalsForB, nMachesB);
+
+                let probGoals;
+
+                for (let i = 0; i <= 3; i++) {
+                    const probGoals = projections.poissonProbability(i, lambdaGoalsFA).toFixed(3);
+                    projections.probGoalsA[i] = probGoals / 100;
+                }
+
+
+                for (let i = 0; i <= 3; i++) {
+                    const probGoals = projections.poissonProbability(i, lambdaGoalsFB).toFixed(3);
+                    projections.probGoalsB[i] = probGoals / 100;
+                }
+
+                console.log("Probabilidad de goles A, con poisson :".bgMagenta, projections.probGoalsA);
+                console.log("Probabilidad de goles B, con poisson :".bgMagenta, projections.probGoalsB);
+
+                // Calcular la probabilidad de cada marcador
+                const probabilidadesMarcador = projections.calcularProbabilidadMarcador(projections.probGoalsA, projections.probGoalsB);
+
+                // Normalizar las probabilidades para que sumen 1
+                const sumaProbabilidades = Object.values(probabilidadesMarcador).reduce((a, b) => a + b, 0);
+                const probabilidadesNormalizadas = {};
+
+                Object.keys(probabilidadesMarcador).forEach(marcador => {
+                    probabilidadesNormalizadas[marcador] = probabilidadesMarcador[marcador] / sumaProbabilidades;
+                });
+
+                // Imprimir las probabilidades normalizadas de cada marcador
+                Object.keys(probabilidadesNormalizadas).forEach(marcador => {
+                    console.log(`Probabilidad de marcador ${marcador}: ${(probabilidadesNormalizadas[marcador] * 100).toFixed(2)}%`);
+                });
+
+                await pause();
+                break;
             case '11':
                 const game = new GamePronostic();
                 // Ejemplo de uso
@@ -292,6 +339,15 @@ const main = async () => {
                 const victt = parseFloat(await readInput("Victorias equipo B (W)".bgBlue));
                 const p2 = game.calculateProbabilityOfP(victt, matchc);
                 const probBb = game.binomialProbability(n, k, p2);
+                const homeAdvantageA = 1.15;
+                const awayDisadvantageB = 0.85;
+
+                const adjustedProbAa = probAa * homeAdvantageA;
+                const adjustedProbBb = probBb * awayDisadvantageB;
+
+                const totalAdjustedProbability = adjustedProbAa + probBb + adjustedProbBb;
+                const probAaNormalized = (adjustedProbAa / totalAdjustedProbability) * 100;
+                const probBbNormalized = (adjustedProbBb / totalAdjustedProbability) * 100;
 
                 console.log(`La probabilidad de tener exactamente ${k} éxitos en ${n} ensayos es: ${probAa.toFixed(2)}% `.cyan);
                 console.log(`La probabilidad de que B tenga exactamente ${k} éxitos en ${n} ensayos es: ${probBb.toFixed(2)}% `.cyan);
@@ -309,11 +365,11 @@ const main = async () => {
                 const probHeadToHeadA = probtoWinAhTh;
                 const probHeadToHeadB = probtoWinBhTh;
 
-                const weightRecentt = 0.6;
-                const weightHeadToHeadd = 0.4;
+                const weightRecentt = 1;
+                const weightHeadToHeadd = 0;
 
-                const weightedProbA1 = game.weightedProbability(probAa, probHeadToHeadA, weightRecentt, weightHeadToHeadd);
-                const weightedProB2 = game.weightedProbability(probBb, probHeadToHeadB, weightRecentt, weightHeadToHeadd);
+                const weightedProbA1 = game.weightedProbability(probAaNormalized, probHeadToHeadA, weightRecentt, weightHeadToHeadd);
+                const weightedProB2 = game.weightedProbability(probBbNormalized, probHeadToHeadB, weightRecentt, weightHeadToHeadd);
 
                 console.log(`Probabilidad ponderada de que el EQUIPO A gane: ${weightedProbA1}%`.yellow);
                 console.log(`Probabilidad ponderada de que el EQUIPO B gane: ${weightedProB2}%`.yellow);
@@ -351,11 +407,11 @@ const main = async () => {
                 console.log("probabilidad de perder el siguiente encuentro del equipo B".yellow)
                 const MpB = parseFloat(await readInput("Número de partidos jugados donde perdió B (MP)".bgBlue));
                 const lossesB = parseFloat(await readInput("Número de partidos perdidos por B".bgBlue));
-        
+
                 const rl = game.calculateProbabilityOfQ(lossesB, MpB);
                 const probabilityOfLossBb = game.binomialProbability(n, k, rl);
                 console.log(`La probabilidad de B , de tener exactamente ${k} pérdidas en ${n} partidos es: ${probabilityOfLossBb.toFixed(2)}%`.yellow);
-                
+
                 // Goles por partido
                 console.log("Calcular el número de goles por partidos".yellow);
                 const Nmatches = parseFloat(await readInput("Número de partidos jugados. (mínimo últimos 5 partidos) . **(MP)**".bgCyan));
@@ -381,11 +437,11 @@ const main = async () => {
 
                 // ponderacion 
                 const weightWin = 0.5; // Peso para la probabilidad de ganar
-                const weightDraw = 0.3; // Peso para la probabilidad de empate
-                const weightLose = 0.2; // Peso para la probabilidad de perder
+                const weightDraw = 0.2; // Peso para la probabilidad de empate
+                const weightLose = 0.3; // Peso para la probabilidad de perder
 
-                const weightedProbWinA = game.weightedWinningProbability(probAa, weightedProbDraww * 100, probabilityOfLossAa, weightWin, weightDraw, weightLose);
-                const weightedProbWinB = game.weightedWinningProbability(probBb, weightedProbDraww * 100, probabilityOfLossBb,weightWin, weightDraw, weightLose);
+                const weightedProbWinA = game.weightedWinningProbability(probAaNormalized, weightedProbDraww * 100, probabilityOfLossAa, weightWin, weightDraw, weightLose);
+                const weightedProbWinB = game.weightedWinningProbability(probBbNormalized, weightedProbDraww * 100, probabilityOfLossBb, weightWin, weightDraw, weightLose);
 
                 game.match['teamName'] = teamAa;
                 game.match['probTowinLastPerformance'] = (probAa).toFixed(2);
@@ -394,7 +450,7 @@ const main = async () => {
                 game.match['probToLost'] = (probabilityOfLossAa).toFixed(2);
                 game.match['probToWinAponderada'] = (weightedProbWinA).toFixed(2);
                 game.match['goalsPerMatchAverage'] = (lambda).toFixed(2);
-            
+
                 game.matchB['teamName'] = teambB;
                 game.matchB['probTowinLastPerformance'] = (probBb).toFixed(2);
                 game.matchB['probtoWinHeadToHead'] = weightedProB2;
